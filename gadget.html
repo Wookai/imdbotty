@@ -15,7 +15,6 @@ google.load("jqueryui", "1.7.2");
 
 google.setOnLoadCallback(function() {
 	$('#movie').corner("bite 10px").parent().css('padding', '8px').corner("bite 10px");
-	console.log('done !');
 	$("#ratingbar").progressbar({
 			value: {{ movie.ratingInt }}
 		});
