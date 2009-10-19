@@ -1,0 +1,66 @@
+body {
+	font-family: Verdana;
+	font-size: 11px;
+}
+
+#frame {
+	background-color: #CC8822;
+	width: 400px;
+}
+
+#movie {
+	background-color: #FFFFCC;
+	padding: 10px;
+}
+
+#cover {
+	float: left;
+	margin-right: 10px;
+}
+
+#infos {
+	float: left;
+}
+
+.label {
+	margin-top: 8px;
+	margin-bottom: 3px;
+	font-weight: bold;
+}
+
+#title {
+	margin-bottom: 8px;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+#title a {
+	color: black;
+	text-decoration: none;
+}
+
+#title a:hover {
+	text-decoration: underline;
+}
+
+#ratingbar {
+	width: 150px;
+	height: 8px;
+	float: left;
+	margin-top: 1px;
+	margin-right: 5px;
+}
+
+#rating {
+	float: left;
+}
+
+#logo {
+	position: absolute;
+	right: 10px;
+	bottom: 10px;
+}
+
+.clear {
+	clear: both;
+}

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+  <ModulePrefs title="IMDbotty">
+    <Require feature="wave" />
+    <Require feature="locked-domain" /> 
+    <Require feature="dynamic-height" /> 
+  </ModulePrefs>
+  <Content type="html">
+    <![CDATA[     
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript">
+
+google.load("jquery", "1.3.2");
+google.load("jqueryui", "1.7.2");
+
+google.setOnLoadCallback(function() {
+	$('#movie').corner("bite 10px").parent().css('padding', '8px').corner("bite 10px");
+	console.log('done !');
+	$("#ratingbar").progressbar({
+			value: {{ movie.ratingInt }}
+		});
+})
+
+</script>
+<script type="text/javascript" src="http://imdbotty.appspot.com/assets/jquery.corner.js"></script>
+<style type="text/css">
+
+
+ @import url(http://imdbotty.appspot.com/assets/reset.css);
+ @import url(http://imdbotty.appspot.com/assets/style.css);
+ @import url(http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.0/themes/ui-lightness/jquery-ui.css);
+
+</style>
+<div id="frame">
+<div id="movie">
+<div id="cover">
+	<a href="{{ movie.url }}">
+		<img src="{{ movie.coverURL }}" alt="{{ movie.title }} ({{ movie.year }})" />
+	</a>
+</div>
+<div id="infos">
+	<div id="title"><a href="">{{ movie.title }} ({{ movie.year }})</a></div>
+	<div id="ratingbar"></div>
+	<div id="rating">{{ movie.rating }}</div>
+	<br />
+	<div id="directorsLabel" class="label">Director(s):</div>
+	<div id="directors" class="values">
+	{% for director in movie.directors %}
+	{{ director }}<br />
+	{% endfor %}
+	</div>
+	<div id="actorsLabel" class="label">Actors:</div>
+	<div id="actors" class="values">
+	{% for actor in movie.actors %}
+	{{ actor }}<br />
+	{% endfor %}		
+	</div>
+</div>
+<div id="logo"><a href="http://www.imdb.com"><img src="http://imdbotty.appspot.com/assets/IMDb.png" alt="IMDb" /></a></div>
+<div class="clear"></div>
+</div>
+    ]]>
+  </Content>
+</Module>
