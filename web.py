@@ -75,6 +75,9 @@ class GadgetPage(webapp.RequestHandler):
   def get(self):
     movieID = self.request.get('movieID')
 
+    if movieID == '':
+        movieID = '0133093' # Follow the white rabbit...
+
     movie = memcache.get(movieID)
 
     if movie is None:
