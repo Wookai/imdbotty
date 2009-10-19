@@ -1,6 +1,7 @@
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
+from google.appengine.api import memcache
 
 import os
 import urllib
@@ -74,7 +75,11 @@ class GadgetPage(webapp.RequestHandler):
   def get(self):
     movieID = self.request.get('movieID')
 
-    movie = IMDbMovie(movieID)
+    movie = memcache.get(movieID)
+
+    if movie is None:
+        movie = IMDbMovie(movieID)
+        memcache.add(movieID, movie, 3600*24*30) # expires in 30 days
     
     template_values = {
       'movie': movie
