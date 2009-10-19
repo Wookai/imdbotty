@@ -44,7 +44,7 @@ def OnBlipSubmitted(properties, context):
 if __name__ == '__main__':
   myRobot = robot.Robot('IMDbotty',
       image_url='http://imdbotty.appspot.com/assets/imdbotty.png',
-      version='1.0.3',
+      version='1.0.4',
       profile_url='http://imdbotty.appspot.com/')
   myRobot.RegisterHandler(events.BLIP_SUBMITTED, OnBlipSubmitted)
   myRobot.RegisterHandler(events.WAVELET_SELF_ADDED, OnRobotAdded)
