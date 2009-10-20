@@ -38,7 +38,11 @@ google.setOnLoadCallback(function() {
 	</a>
 </div>
 <div id="infos">
-	<div id="title"><a href="">{{ movie.title }} ({{ movie.year }})</a></div>
+	<div id="title">
+	{% if movie.isTvSerie %}
+		<img src="http://imdbotty.appspot.com/assets/tv_icon.gif" title="TV show" alt="TV show" />
+	{% endif %}
+		<a href="">{{ movie.title }} ({{ movie.year }})</a></div>
 	<div id="ratingbar"></div>
 	<div id="rating">{{ movie.rating }}</div>
 	<br />
