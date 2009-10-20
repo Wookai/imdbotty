@@ -42,12 +42,21 @@ google.setOnLoadCallback(function() {
 	<div id="ratingbar"></div>
 	<div id="rating">{{ movie.rating }}</div>
 	<br />
-	<div id="directorsLabel" class="label">Director(s):</div>
-	<div id="directors" class="values">
-	{% for director in movie.directors %}
-	{{ director }}<br />
-	{% endfor %}
-	</div>
+	{% if movie.isTvSerie %}
+		<div id="creatorsLabel" class="label">Creators:</div>
+		<div id="creators" class="values">
+		{% for creator in movie.creators %}
+		{{ creator }}<br />
+		{% endfor %}
+		</div>
+	{% else %}
+		<div id="directorsLabel" class="label">Director(s):</div>
+		<div id="directors" class="values">
+		{% for director in movie.directors %}
+		{{ director }}<br />
+		{% endfor %}
+		</div>
+	{% endif %}
 	<div id="actorsLabel" class="label">Actors:</div>
 	<div id="actors" class="values">
 	{% for actor in movie.actors %}
