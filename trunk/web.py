@@ -41,19 +41,33 @@ class IMDbMovie:
 
         # parse rating
         m = ratingPattern.search(html)
-        self.rating = m.group('rating')
-        self.ratingInt = int(self.rating.replace('/10', '').replace('.', ''))
+        if m is None:
+            self.rating = 'N/A'
+            self.ratingInt = 0
+        else:
+            self.rating = m.group('rating')
+            self.ratingInt = int(self.rating.replace('/10', '').replace('.', ''))
 
         if self.isTvSerie:
             # parse creators
-            creators = creatorsPattern.search(html).group('creators')
-            for c in creatorsSubpattern.finditer(creators):
-                self.creators.append(c.group('name'))
+            creators = creatorsPattern.search(html)
+
+            if creators is None:
+                self.creators.append('N/A')
+            else:
+                creators = creators.group('creators')
+                for c in creatorsSubpattern.finditer(creators):
+                    self.creators.append(c.group('name'))
         else:
             # parse directors
-            directors = directorsPattern.search(html).group('directors')
-            for d in directorsSubpattern.finditer(directors):
-                self.directors.append(d.group('name'))
+            directors = directorsPattern.search(html)
+
+            if directors is None:
+                self.directors.append('N/A')
+            else:
+                directors = directors.group('directors')
+                for d in directorsSubpattern.finditer(directors):
+                    self.directors.append(d.group('name'))
 
         # parse actors
         nbActorsMax = 6
