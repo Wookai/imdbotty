@@ -1,4 +1,4 @@
-<extension name="IMDbotty" description="IMDbotty replaces links to movies on IMDb with a small gadget that displays useful information about the movie (title, year, rating, cover, director(s), actors)." thumbnailUrl="https://imdbotty.appspot.com/assets/imdbotty_thumbnail.png">
+<extension name="IMDbotty" description="IMDbotty replaces links to movies on IMDb with a small gadget that displays useful information about the movie (title, year, rating, cover, director(s), actors)." thumbnailUrl="https://imdbotty.appspot.com/assets/thumbnail.png">
   <author name="Vincent Etter"/>
   <menuHook location="newwavemenu" text="Creates a new wave with IMDbotty." 
       iconUrl="http://imdbotty.appspot.com/assets/imdbotty_icon.png">

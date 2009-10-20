@@ -11,5 +11,8 @@ handlers:
 - url: /favicon.ico
   static_files: favicon.ico
   upload: favicon.ico
+- url: /manifest.xml
+  static_files: manifest.xml
+  upload: manifest.xml
 - url: /.*
   script: web.py

@@ -22,7 +22,7 @@ def OnBlipSubmitted(properties, context):
   # find all urls
   urls = []
   for url in imdbLinkPattern.finditer(doc.GetText()):
-    logging.debug('Found movie url %s (movie ID %s)' % (url.group(0), url.group('movieID')))
+    logging.debug('Found IMDb url %s (movie ID %s)' % (url.group(0), url.group('movieID')))
     urls.append(url)
 
   # reverse array to replace matches from the last one to the first one
@@ -44,7 +44,7 @@ def OnBlipSubmitted(properties, context):
 if __name__ == '__main__':
   myRobot = robot.Robot('IMDbotty',
       image_url='http://imdbotty.appspot.com/assets/imdbotty.png',
-      version='1.0.4',
+      version='1.1.0',
       profile_url='http://imdbotty.appspot.com/')
   myRobot.RegisterHandler(events.BLIP_SUBMITTED, OnBlipSubmitted)
   myRobot.RegisterHandler(events.WAVELET_SELF_ADDED, OnRobotAdded)

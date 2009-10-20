@@ -7,11 +7,14 @@ import os
 import urllib
 import re
 
+tvSeriesPattern = '<span class="tv-extra">TV series</span>'
 titlePattern = re.compile('<div id="tn15title">\s+<h1>(?P<title>[^<]+)\s+<span>\(<a[^>]+>(?P<year>\d+)</a>\)')
-coverPattern = re.compile('<div class="photo">\s+<a[^>]+name="poster"[^>]+><img[^>]+src="(?P<coverURL>http://[^"]+)"[^>]+></a>')
+coverPattern = re.compile('<div class="photo">\s+<a[^>]+><img[^>]+src="(?P<coverURL>http://[^"]+)"[^>]+></a>')
 ratingPattern = re.compile('<div class="meta">\s+<b>(?P<rating>[\d\.]+/10)</b>')
 directorsPattern = re.compile('<div[^>]*id="director-info"[^>]*>\s+<h5>[^<]+</h5>\s+(?P<directors>(<a[^>]+>([^<]+)</a><br/>\s+)+)</div>')
 directorsSubpattern = re.compile('<a[^>]+>(?P<name>[^<]+)</a>')
+creatorsPattern = re.compile('<div class="info">\s+<h5>Creators:</h5>\s+(?P<creators>(<a[^>]+>([^<]+)</a><br/>\s+)+)</div>')
+creatorsSubpattern = re.compile('<a[^>]+onclick="[^>]+>(?P<name>[^<]+)</a>')
 actorPattern = re.compile('<td class="nm"><a[^>]+>(?P<name>[^<]+)</a></td>')
 
 class IMDbMovie:
@@ -19,12 +22,14 @@ class IMDbMovie:
         self.url = 'http://www.imdb.com/title/tt' + movieID
 
         self.title, self.year, self.coverURL, self.rating = '', '', '', ''
-        self.directors, self.actors = [], []
+        self.creators, self.directors, self.actors = [], [], []
         
         self.parseData()
 
     def parseData(self):
         html = urllib.urlopen(self.url).read()
+
+        self.isTvSerie = (html.find(tvSeriesPattern) > -1)
 
         # parse title and year
         m = titlePattern.search(html)
@@ -39,10 +44,16 @@ class IMDbMovie:
         self.rating = m.group('rating')
         self.ratingInt = int(self.rating.replace('/10', '').replace('.', ''))
 
-        # parse directors
-        directors = directorsPattern.search(html).group('directors')
-        for d in directorsSubpattern.finditer(directors):
-            self.directors.append(d.group('name'))
+        if self.isTvSerie:
+            # parse creators
+            creators = creatorsPattern.search(html).group('creators')
+            for c in creatorsSubpattern.finditer(creators):
+                self.creators.append(c.group('name'))
+        else:
+            # parse directors
+            directors = directorsPattern.search(html).group('directors')
+            for d in directorsSubpattern.finditer(directors):
+                self.directors.append(d.group('name'))
 
         # parse actors
         nbActorsMax = 6
@@ -55,13 +66,19 @@ class IMDbMovie:
 
     def __str__(self):
         print 'Title:', self.title
+        print 'TvSerie:', self.isTvSerie
         print 'Year:', self.year
         print 'URL:', self.url
         print 'Cover URL:', self.coverURL
         print 'Rating:', self.rating
-        print 'Director(s):'
-        for d in self.directors:
-            print '', d
+        if self.isTvSerie:
+            print 'Creator(s):'
+            for c in self.creators:
+                print '', c
+        else:
+            print 'Director(s):'
+            for d in self.directors:
+                print '', d
         print 'Actors:'
         for a in self.actors:
             print '', a
