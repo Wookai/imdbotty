@@ -18,7 +18,61 @@ google.setOnLoadCallback(function() {
 	$("#ratingbar").progressbar({
 			value: {{ movie.ratingInt }}
 		});
+	$('#actions img').click(reduce);
+
+  if (!wave.getState()) {
+    return;
+  }
+  
+	wave.setStateCallback(resizeGadget);
+
+	if (wave.getState().get('status') == 'reduce') {
+		reduce();
+	}
 })
+
+function reduce() {
+	$('#movie').uncorner().parent().css('padding', '0px').uncorner();
+	$('.detail').hide('normal');
+	$('#frame').animate({width: 200});
+	$('#movie').css('padding', '3px');
+	$('#title').toggleClass('titleExpanded');
+	$('#actions').animate({top: 1, right: 3});
+	stateChanged('expand', 'reduce', expand);
+}
+
+function expand() {
+	$('#movie').css('padding', '10px');
+	$('#movie').corner("bite 10px").parent().css('padding', '8px').corner("bite 10px");
+	$('.detail').show('normal');
+	$('#frame').animate({width: 400});
+	$('#title').toggleClass('titleExpanded');
+	$('#actions').animate({top: 10, right: 10});
+	stateChanged('reduce', 'expand', reduce);
+}
+
+function stateChanged(oldState, newState, clickFunc) {
+	$('#actions img').attr('src', $('#actions img').attr('src').replace(newState, oldState))
+									 .attr('alt', ucfirst(oldState) + ' details').attr('title', ucfirst(oldState) + ' details')
+									 .unbind('click').click(clickFunc);
+
+  if (!wave.getState()) {
+    return;
+  }
+
+	delta = {'status': newState};
+	wave.getState().submitDelta(delta);
+}
+
+function resizeGadget() {
+	gadgets.window.adjustHeight();
+}
+
+function ucfirst (str) {
+    str += '';
+    var f = str.charAt(0).toUpperCase();
+    return f + str.substr(1);
+}
 
 </script>
 <script type="text/javascript" src="http://imdbotty.appspot.com/assets/jquery.corner.js"></script>
@@ -32,44 +86,47 @@ google.setOnLoadCallback(function() {
 </style>
 <div id="frame">
 <div id="movie">
-<div id="cover">
-	<a href="{{ movie.url }}">
+<div id="cover" class="detail">
+	<a href="{{ movie.url }}" target="_blank">
 		<img src="{{ movie.coverURL }}" alt="{{ movie.title }} ({{ movie.year }})" />
 	</a>
 </div>
 <div id="infos">
-	<div id="title">
+	<div id="actions">
+		<img src="http://imdbotty.appspot.com/assets/reduce.png" alt="Reduce widget" title="Reduce widget" />
+	</div>
+	<div id="title" class="titleExpanded">
 	{% if movie.isTvSerie %}
 		<img src="http://imdbotty.appspot.com/assets/tv_icon.gif" title="TV show" alt="TV show" />
 	{% endif %}
-		<a href="">{{ movie.title }} ({{ movie.year }})</a></div>
-	<div id="ratingbar"></div>
-	<div id="rating">{{ movie.rating }}</div>
-	<br />
+		<a href="{{ movie.url }}" target="_blank">{{ movie.title }} ({{ movie.year }})</a>
+	</div>
+	<div id="ratingbar" class="detail"></div>
+	<div id="rating" class="detail">{{ movie.rating }}</div>
 	{% if movie.isTvSerie %}
-		<div id="creatorsLabel" class="label">Creators:</div>
-		<div id="creators" class="values">
+		<div id="creatorsLabel" class="label detail">Creators:</div>
+		<div id="creators" class="values detail">
 		{% for creator in movie.creators %}
 		{{ creator }}<br />
 		{% endfor %}
 		</div>
 	{% else %}
-		<div id="directorsLabel" class="label">Director(s):</div>
-		<div id="directors" class="values">
+		<div id="directorsLabel" class="label detail">Director(s):</div>
+		<div id="directors" class="values detail">
 		{% for director in movie.directors %}
 		{{ director }}<br />
 		{% endfor %}
 		</div>
 	{% endif %}
-	<div id="actorsLabel" class="label">Actors:</div>
-	<div id="actors" class="values">
+	<div id="actorsLabel" class="label detail">Actors:</div>
+	<div id="actors" class="values detail">
 	{% for actor in movie.actors %}
 	{{ actor }}<br />
 	{% endfor %}		
 	</div>
 </div>
-<div id="logo"><a href="http://www.imdb.com"><img src="http://imdbotty.appspot.com/assets/IMDb.png" alt="IMDb" /></a></div>
-<div class="clear"></div>
+<div id="logo" class="detail"><a href="http://www.imdb.com"><img src="http://imdbotty.appspot.com/assets/IMDb.png" alt="IMDb" /></a></div>
+<div class="clear detail"></div>
 </div>
     ]]>
   </Content>
