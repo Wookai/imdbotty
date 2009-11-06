@@ -23,8 +23,11 @@ class GadgetPage(webapp.RequestHandler):
     movie = memcache.get(movieID)
 
     if movie is None:
+        logging.debug('Movie %s not found in cache, donwloading from IMDb...' % movieID)
         movie = imdbParser.IMDbParser(movieID)
         memcache.add(movieID, movie, 3600*24*30) # expires in 30 days
+    else:
+        logging.debug('Movie %s found in cache' % movieID)
     
     template_values = {
       'movie': movie
