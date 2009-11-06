@@ -24,9 +24,10 @@ class GadgetPage(webapp.RequestHandler):
     movie = memcache.get(movieID)
 
     if movie is None:
-        logging.debug('Movie %s not found in cache, donwloading from IMDb...' % movieID)
+        logging.debug('Movie %s not found in cache, downloading from IMDb...' % movieID)
         movie = imdbParser.IMDbParser(movieID)
-        memcache.add(movieID, movie, 3600*24*30) # expires in 30 days
+        if not memcache.add(movieID, movie):
+            logging.debug('Unable to add movie to the cache')
     else:
         logging.debug('Movie %s found in cache' % movieID)
     
