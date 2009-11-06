@@ -4,6 +4,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.api import memcache
 
 import os
+import logging
 import imdbParser
 
 class MainPage(webapp.RequestHandler):
