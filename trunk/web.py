@@ -14,6 +14,14 @@ class MainPage(webapp.RequestHandler):
 
 More information maybe later... In the mean time, check http://code.google.com/p/imdbotty/ !""")
 
+class FlushPage(webapp.RequestHandler):
+  def get(self):
+    self.response.headers['Content-Type'] = 'text/plain'
+    if (memcache.flush_all()):
+        self.response.out.write('Cache flushed !')
+    else:
+        self.response.out.write('Cannot flush cache...')
+
 class GadgetPage(webapp.RequestHandler):
   def get(self):
     movieID = self.request.get('movieID')
@@ -40,7 +48,9 @@ class GadgetPage(webapp.RequestHandler):
     self.response.out.write(template.render(path, template_values))
 
 application = webapp.WSGIApplication(
-                                     [('/', MainPage), ('/gadget.xml', GadgetPage)],
+                                     [('/', MainPage),
+                                      ('/gadget.xml', GadgetPage),
+                                      ('/flush', FlushPage)],
                                      debug=True)
 
 def main():
