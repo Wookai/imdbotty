@@ -1,16 +1,24 @@
 import re
 import urllib
 
+class IMDbPerson:
+    def __init__(self, name, url):
+        self.url = url
+        self.name = name
+    
+    def __str__(self):
+        return self.name + '\t' + self.url
+
 class IMDbParser:
     tvSeriesPattern = '<span class="tv-extra">TV series</span>'
     titlePattern = re.compile('<div id="tn15title">\s+<h1>(?P<title>[^<]+)\s+<span>\(<a[^>]+>(?P<year>\d+)</a>[^)]*\)')
     coverPattern = re.compile('<div class="photo">\s+<a[^>]+><img[^>]+src="(?P<coverURL>http://[^"]+)"[^>]+></a>')
     ratingPattern = re.compile('<div class="meta">\s+<b>(?P<rating>[\d\.]+/10)</b>')
-    directorsPattern = re.compile('<div[^>]*id="director-info"[^>]*>\s+<h5>[^<]+</h5>\s+(?P<directors>(<a[^>]+>([^<]+)</a><br/>\s+)+)</div>')
-    directorsSubpattern = re.compile('<a[^>]+>(?P<name>[^<]+)</a>')
-    creatorsPattern = re.compile('<div class="info">\s+<h5>Creators:</h5>\s+(?P<creators>(<a[^>]+>([^<]+)</a><br/>\s+)+)</div>')
-    creatorsSubpattern = re.compile('<a[^>]+onclick="[^>]+>(?P<name>[^<]+)</a>')
-    actorPattern = re.compile('<td class="nm"><a[^>]+>(?P<name>[^<]+)</a></td>')
+    directorsPattern = re.compile('<div[^>]*id="director-info"[^>]*>\s+<h5>[^<]+</h5>\s+(?P<directors>(<a[^>]+>([^<]+)</a>[^<]*<br/>\s+)+)</div>')
+    directorsSubpattern = re.compile('<a[^>]+href="(?P<url>[^"]+)"[^>]*>(?P<name>[^<]+)</a>')
+    creatorsPattern = re.compile('<div class="info">\s+<h5>Creators:</h5>\s+(?P<creators>(<a[^>]+>([^<]+)</a>[^<]*<br/>\s+)+)</div>')
+    creatorsSubpattern = re.compile('<a[^>]+href="(?P<url>[^"]+)"[^>]*>(?P<name>[^<]+)</a>')
+    actorPattern = re.compile('<td class="nm"><a[^>]*href="(?P<url>[^"]+)"[^>]*>(?P<name>[^<]+)</a></td>')
 
     def __init__(self, movieID):
         """ Parses data from a movie/tv show on IMDb """
@@ -48,21 +56,21 @@ class IMDbParser:
             creators = self.creatorsPattern.search(html)
 
             if creators is None:
-                self.creators.append('N/A')
+                self.creators.append(IMDbPerson('N/A', ''))
             else:
                 creators = creators.group('creators')
                 for c in self.creatorsSubpattern.finditer(creators):
-                    self.creators.append(c.group('name'))
+                    self.creators.append(IMDbPerson(c.group('name'), c.group('url')))
         else:
             # parse directors
             directors = self.directorsPattern.search(html)
 
             if directors is None:
-                self.directors.append('N/A')
+                self.directors.append(IMDbPerson('N/A', ''))
             else:
                 directors = directors.group('directors')
                 for d in self.directorsSubpattern.finditer(directors):
-                    self.directors.append(d.group('name'))
+                    self.directors.append(IMDbPerson(d.group('name'), d.group('url')))
 
         # parse actors
         nbActorsMax = 6
@@ -70,7 +78,7 @@ class IMDbParser:
         for a in self.actorPattern.finditer(html):
             if i > nbActorsMax:
                 break
-            self.actors.append(a.group('name'))
+            self.actors.append(IMDbPerson(a.group('name'), a.group('url')))
             i = i + 1
 
     def __str__(self):
@@ -83,12 +91,12 @@ class IMDbParser:
         if self.isTvSerie:
             print 'Creator(s):'
             for c in self.creators:
-                print '', c
+                print '', c['name'], c['url']
         else:
             print 'Director(s):'
             for d in self.directors:
-                print '', d
+                print '', d['name'], d['url']
         print 'Actors:'
         for a in self.actors:
-            print '', a
+            print '', a['name'], a['url']
         

@@ -5,7 +5,7 @@ body {
 
 #frame {
 	background-color: #CC8822;
-	width: 400px;
+	width: 450px;
 }
 
 #movie {
@@ -41,26 +41,32 @@ body {
 	margin-bottom: -2px;
 }
 
-#title a {
+a, a:active, a:visited {
 	color: black;
 	text-decoration: none;
 }
 
-#title a:hover {
+a:hover {
 	text-decoration: underline;
+}
+
+#actors a, #directors a, #creators a {
+	background-image: url('link_icon.png');
+	background-repeat: no-repeat;
+	background-position: center left;
+	padding-left: 10px;
+}
+
+#rating, #ratingbar {
+	float: left;
+	margin-bottom: 8px;
 }
 
 #ratingbar {
 	width: 150px;
 	height: 8px;
-	float: left;
 	margin-top: 1px;
 	margin-right: 5px;
-	margin-bottom: 8px;
-}
-
-#rating {
-	float: left;
 }
 
 #logo {

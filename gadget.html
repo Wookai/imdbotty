@@ -22,45 +22,49 @@ function init() {
 	
 	$('#actions img').click(doReduce);
 
-	wave.setStateCallback(stateChanged);
-	
-	// call stateChanged to hide details if needed
-	stateChanged();
+	if (wave && wave.isInWaveContainer()) {
+		wave.setStateCallback(stateChanged);
+		
+		// call stateChanged to hide details if needed
+		stateChanged();
+	}
 }
 
 gadgets.util.registerOnLoadHandler(init);
 
 // called each time we reduce/expand the gadget
 function stateChanged() {
-	newState = wave.getState().get('status');
-	
-	if (newState == 'reduce') {
-		reduce();
-	}
-	else {
-		expand();
+	if (wave.getState()) {
+		newState = wave.getState().get('status');
+		
+		if (newState == 'reduce') {
+			reduce();
+		}
+		else {
+			expand();
+		}
 	}
 }
 
 // called when clicking on the reduce button
 function doReduce() {
-	changeState('expand', 'reduce', doExpand);
+	changeState('reduce');
 }
 
 // called when clicking on the expand button
 function doExpand() {
-	changeState('reduce', 'expand', doReduce);
+	changeState('expand');
 }
 
 // hides details to reduce gadget
 function reduce() {
 	$('#movie').uncorner().parent().css('padding', '0px').uncorner();
 	$('.detail').hide('normal');
-	$('#frame').animate({width: 300});
+	$('#frame').animate({width: 350});
 	$('#movie').css('padding', '3px');
-	$('#title').toggleClass('titleExpanded');
+	$('#title').removeClass('titleExpanded');
 	$('#actions').animate({top: 1, right: 3}, 'normal', 'linear', resizeGadget);
-	toggleActionButton('expand', 'reduce', expand);
+	toggleActionButton('expand', 'reduce', doExpand);
 }
 
 // shows details to expand gadget
@@ -69,10 +73,10 @@ function expand() {
 	$('#movie').css('padding', '10px');
 	$('#movie').corner("bite 10px").parent().css('padding', '8px').corner("bite 10px");
 	$('.detail').show('normal');
-	$('#frame').animate({width: 400}, 'normal', 'linear', resizeGadget);
-	$('#title').toggleClass('titleExpanded');
+	$('#frame').animate({width: 450}, 'normal', 'linear', resizeGadget);
+	$('#title').addClass('titleExpanded');
 	$('#actions').animate({top: 10, right: 10});
-	toggleActionButton('reduce', 'expand', reduce);
+	toggleActionButton('reduce', 'expand', doReduce);
 }
 
 // toggles the expand/reduce button
@@ -131,21 +135,21 @@ function ucfirst (str) {
 		<div id="creatorsLabel" class="label detail">Creators:</div>
 		<div id="creators" class="values detail">
 		{% for creator in movie.creators %}
-		{{ creator }}<br />
+			<a href="http://www.imdb.com{{ creator.url }}" target="_blank">{{ creator.name }}<br />
 		{% endfor %}
 		</div>
 	{% else %}
 		<div id="directorsLabel" class="label detail">Director(s):</div>
 		<div id="directors" class="values detail">
 		{% for director in movie.directors %}
-		{{ director }}<br />
+			<a href="http://www.imdb.com{{ director.url }}" target="_blank">{{ director.name }}</a><br />
 		{% endfor %}
 		</div>
 	{% endif %}
 	<div id="actorsLabel" class="label detail">Actors:</div>
 	<div id="actors" class="values detail">
 	{% for actor in movie.actors %}
-	{{ actor }}<br />
+		<a href="http://www.imdb.com{{ actor.url }}" target="_blank">{{ actor.name }}</a><br />
 	{% endfor %}		
 	</div>
 </div>
