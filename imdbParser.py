@@ -1,5 +1,6 @@
 import re
 import urllib
+import logging
 
 class IMDbPerson:
     def __init__(self, name, url):
@@ -10,29 +11,48 @@ class IMDbPerson:
         return self.name + '\t' + self.url
 
 class IMDbParser:
-    tvSeriesPattern = '<span class="tv-extra">TV series</span>'
-    titlePattern = re.compile('<div id="tn15title">\s+<h1>(?P<title>[^<]+)\s+<span>\(<a[^>]+>(?P<year>\d+)</a>[^)]*\)')
+    tvSeriesPattern = re.compile('<span class="tv-extra">[^<]*TV[^<]*</span>')
+    titlePattern = re.compile('<div id="tn15title">\s+<h1>(?P<title>[^<]+)\s+<span>\((<a[^>]+>)?(?P<year>\d+)(</a>)?[^)]*\)')
     coverPattern = re.compile('<div class="photo">\s+<a[^>]+><img[^>]+src="(?P<coverURL>http://[^"]+)"[^>]+></a>')
-    ratingPattern = re.compile('<div class="meta">\s+<b>(?P<rating>[\d\.]+/10)</b>')
+    ratingPattern = re.compile('<div class="meta">\s+<b>(?P<rating>[\d\.,]+/10)</b>')
     directorsPattern = re.compile('<div[^>]*id="director-info"[^>]*>\s+<h5>[^<]+</h5>\s+(?P<directors>(<a[^>]+>([^<]+)</a>[^<]*<br/>\s+)+)</div>')
     directorsSubpattern = re.compile('<a[^>]+href="(?P<url>[^"]+)"[^>]*>(?P<name>[^<]+)</a>')
     creatorsPattern = re.compile('<div class="info">\s+<h5>Creators:</h5>\s+(?P<creators>(<a[^>]+>([^<]+)</a>[^<]*<br/>\s+)+)</div>')
-    creatorsSubpattern = re.compile('<a[^>]+href="(?P<url>[^"]+)"[^>]*>(?P<name>[^<]+)</a>')
+    creatorsSubpattern = re.compile('<a href="(?P<url>[^"]+)" onclick="[^"]*">(?P<name>[^<]+)</a>')
     actorPattern = re.compile('<td class="nm"><a[^>]*href="(?P<url>[^"]+)"[^>]*>(?P<name>[^<]+)</a></td>')
 
-    def __init__(self, movieID):
+    def __init__(self, subdomain, extension, movieID):
         """ Parses data from a movie/tv show on IMDb """
-        self.url = 'http://www.imdb.com/title/tt' + movieID
+        self.subdomain = subdomain
+        self.extension = extension
+        self.movieID = movieID
+        self.url = 'http://%s.imdb.%s/title/tt%s' % (subdomain, extension, movieID)
 
-        self.title, self.year, self.coverURL, self.rating = '', '', '', ''
+        # default values in case we can't parse the page
+        self.title, self.year, self.coverURL, self.rating = 'N/A', 'N/A', 'http://img407.imageshack.us/img407/6493/titleaddposterw.jpg', 'N/A'
+        self.ratingInt = 0
         self.creators, self.directors, self.actors = [], [], []
         
         self.parseData()
 
     def parseData(self):
-        html = urllib.urlopen(self.url).read()
+        html = ''
+        nbAttemptsMax = 5
+        nbAttempts = 0
+        found = False
+        
+        # try to download the page several times
+        while not found and nbAttempts < nbAttemptsMax:
+            html = urllib.urlopen(self.url).read()
+            found = (self.titlePattern.search(html) is not None)
+            nbAttempts = nbAttempts + 1
+        
+        if not found:
+            logging.warn('Unable to get html content after %s attempts...' % nbAttemptsMax)
+            return
 
-        self.isTvSerie = (html.find(self.tvSeriesPattern) > -1)
+        self.isTvSerie = self.tvSeriesPattern.search(html) is not None
+        logging.debug('Is this a TV show ? ' + str(self.isTvSerie))
 
         # parse title and year
         m = self.titlePattern.search(html)
@@ -49,7 +69,7 @@ class IMDbParser:
             self.ratingInt = 0
         else:
             self.rating = m.group('rating')
-            self.ratingInt = int(self.rating.replace('/10', '').replace('.', ''))
+            self.ratingInt = int(self.rating.replace('/10', '').replace('.', '').replace(',', ''))
 
         if self.isTvSerie:
             # parse creators

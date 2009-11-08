@@ -20,12 +20,14 @@ body {
 
 #infos {
 	float: left;
+	width: 300px;
 }
 
 .label {
 	margin-top: 8px;
 	margin-bottom: 3px;
 	font-weight: bold;
+	clear: left;
 }
 
 #title {
