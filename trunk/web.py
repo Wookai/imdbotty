@@ -25,19 +25,29 @@ class FlushPage(webapp.RequestHandler):
 class GadgetPage(webapp.RequestHandler):
   def get(self):
     movieID = self.request.get('movieID')
+    extension = self.request.get('ext')
+    subdomain = self.request.get('sub')
+
+    if extension == '':
+        extension = 'com'
+    
+    if subdomain == '':
+        subdomain = 'www'
 
     if movieID == '':
         movieID = '0133093' # Follow the white rabbit...
 
-    movie = memcache.get(movieID)
+    cacheKey = '%s.%s.%s' % (subdomain, extension, movieID)
+
+    movie = memcache.get(cacheKey)
 
     if movie is None:
-        logging.debug('Movie %s not found in cache, downloading from IMDb...' % movieID)
-        movie = imdbParser.IMDbParser(movieID)
-        if not memcache.add(movieID, movie):
+        logging.debug('Movie %s not found in cache, downloading from IMDb...' % cacheKey)
+        movie = imdbParser.IMDbParser(subdomain, extension, movieID)
+        if not memcache.add(cacheKey, movie):
             logging.debug('Unable to add movie to the cache')
     else:
-        logging.debug('Movie %s found in cache' % movieID)
+        logging.debug('Movie %s found in cache' % cacheKey)
     
     template_values = {
       'movie': movie

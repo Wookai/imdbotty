@@ -6,7 +6,7 @@ from waveapi import document
 import logging
 import re
 
-imdbLinkPattern = re.compile('(http://)?(www.)?imdb.com/title/tt(?P<movieID>\d{7})(/)?')
+imdbLinkPattern = re.compile('(http://)?(?P<sub>www|uk).imdb.(?P<ext>\w{2,3})/title/tt(?P<movieID>\d{7})(/)?')
 
 
 def OnRobotAdded(properties, context):
@@ -32,7 +32,9 @@ def OnBlipSubmitted(properties, context):
   # do the actual replacement
   for url in urls:
     imdbID = url.group('movieID')
-    gadgetUrl = 'http://imdbotty.appspot.com/gadget.xml?movieID=%s' % imdbID
+    sub = url.group('sub')
+    ext = url.group('ext')
+    gadgetUrl = 'http://imdbotty.appspot.com/gadget.xml?sub=%s&ext=%s&movieID=%s' % (sub, ext, imdbID)
 
     logging.debug('Inserting gadget with url %s' % gadgetUrl)
     
@@ -44,7 +46,7 @@ def OnBlipSubmitted(properties, context):
 if __name__ == '__main__':
   myRobot = robot.Robot('IMDbotty',
       image_url='http://imdbotty.appspot.com/assets/imdbotty.png',
-      version='1.3.0',
+      version='1.4.0',
       profile_url='http://imdbotty.appspot.com/')
   myRobot.RegisterHandler(events.BLIP_SUBMITTED, OnBlipSubmitted)
   myRobot.RegisterHandler(events.WAVELET_SELF_ADDED, OnRobotAdded)

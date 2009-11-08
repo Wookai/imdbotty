@@ -72,7 +72,9 @@ function expand() {
 	gadgets.window.adjustHeight(400);
 	$('#movie').css('padding', '10px');
 	$('#movie').corner("bite 10px").parent().css('padding', '8px').corner("bite 10px");
+	$('#cover').removeClass('detail'); // hack for nice expansion
 	$('.detail').show('normal');
+	$('#cover').addClass('detail').show('slow');
 	$('#frame').animate({width: 450}, 'normal', 'linear', resizeGadget);
 	$('#title').addClass('titleExpanded');
 	$('#actions').animate({top: 10, right: 10});
@@ -135,25 +137,25 @@ function ucfirst (str) {
 		<div id="creatorsLabel" class="label detail">Creators:</div>
 		<div id="creators" class="values detail">
 		{% for creator in movie.creators %}
-			<a href="http://www.imdb.com{{ creator.url }}" target="_blank">{{ creator.name }}<br />
+			<a href="http://{{ movie.subdomain }}.imdb.{{ movie.extension }}{{ creator.url }}" target="_blank">{{ creator.name }}</a><br />
 		{% endfor %}
 		</div>
 	{% else %}
 		<div id="directorsLabel" class="label detail">Director(s):</div>
 		<div id="directors" class="values detail">
 		{% for director in movie.directors %}
-			<a href="http://www.imdb.com{{ director.url }}" target="_blank">{{ director.name }}</a><br />
+			<a href="http://{{ movie.subdomain }}.imdb.{{ movie.extension }}{{ director.url }}" target="_blank">{{ director.name }}</a><br />
 		{% endfor %}
 		</div>
 	{% endif %}
 	<div id="actorsLabel" class="label detail">Actors:</div>
 	<div id="actors" class="values detail">
 	{% for actor in movie.actors %}
-		<a href="http://www.imdb.com{{ actor.url }}" target="_blank">{{ actor.name }}</a><br />
+		<a href="http://{{ movie.subdomain }}.imdb.{{ movie.extension }}{{ actor.url }}" target="_blank">{{ actor.name }}</a><br />
 	{% endfor %}		
 	</div>
 </div>
-<div id="logo" class="detail"><a href="http://www.imdb.com"><img src="http://imdbotty.appspot.com/assets/IMDb.png" alt="IMDb" /></a></div>
+<div id="logo" class="detail"><a href="http://{{ movie.subdomain }}.imdb.{{ movie.extension }}" target="_blank"><img src="http://imdbotty.appspot.com/assets/IMDb.png" alt="IMDb" /></a></div>
 <div class="clear detail"></div>
 </div>
     ]]>
