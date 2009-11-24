@@ -15,9 +15,9 @@ class IMDbParser:
     titlePattern = re.compile('<div id="tn15title">\s+<h1>(?P<title>[^<]+)\s+<span>\((<a[^>]+>)?(?P<year>\d+)(</a>)?[^)]*\)')
     coverPattern = re.compile('<div class="photo">\s+<a[^>]+><img[^>]+src="(?P<coverURL>http://[^"]+)"[^>]+></a>')
     ratingPattern = re.compile('<div class="meta">\s+<b>(?P<rating>[\d\.,]+/10)</b>')
-    directorsPattern = re.compile('<div[^>]*id="director-info"[^>]*>\s+<h5>[^<]+</h5>\s+(?P<directors>(<a[^>]+>([^<]+)</a>[^<]*<br/>\s+)+)</div>')
+    directorsPattern = re.compile('<div[^>]*id="director-info"[^>]*>\s+<h5>(?P<label>[^<]*)</h5>\s+<div class="info-content">\s+(?P<directors>(<a[^>]+>([^<]+)</a>[^<]*<br/>\s+)+)</div>\s+</div>')
     directorsSubpattern = re.compile('<a[^>]+href="(?P<url>[^"]+)"[^>]*>(?P<name>[^<]+)</a>')
-    creatorsPattern = re.compile('<div class="info">\s+<h5>Creators:</h5>\s+(?P<creators>(<a[^>]+>([^<]+)</a>[^<]*<br/>\s+)+)</div>')
+    creatorsPattern = re.compile('<div class="info">\s+<h5>(?P<label>[^<]*)</h5>\s+<div class="info-content">\s+(?P<creators>(<a[^>]+>([^<]+)</a>[^<]*<br/>\s+)+)')
     creatorsSubpattern = re.compile('<a href="(?P<url>[^"]+)" onclick="[^"]*">(?P<name>[^<]+)</a>')
     actorPattern = re.compile('<td class="nm"><a[^>]*href="(?P<url>[^"]+)"[^>]*>(?P<name>[^<]+)</a></td>')
 
