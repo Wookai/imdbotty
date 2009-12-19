@@ -19,6 +19,7 @@ class IMDbParser:
     directorsSubpattern = re.compile('<a[^>]+href="(?P<url>[^"]+)"[^>]*>(?P<name>[^<]+)</a>')
     creatorsPattern = re.compile('<div class="info">\s+<h5>(?P<label>[^<]*)</h5>\s+<div class="info-content">\s+(?P<creators>(<a[^>]+>([^<]+)</a>[^<]*<br/>\s+)+)')
     creatorsSubpattern = re.compile('<a href="(?P<url>[^"]+)" onclick="[^"]*">(?P<name>[^<]+)</a>')
+    actorsLabelPattern = re.compile('<div class="headerinline"><h3>(?P<label>[^>]+)</h3>')
     actorPattern = re.compile('<td class="nm"><a[^>]*href="(?P<url>[^"]+)"[^>]*>(?P<name>[^<]+)</a></td>')
 
     def __init__(self, subdomain, extension, movieID):
@@ -32,6 +33,7 @@ class IMDbParser:
         self.title, self.year, self.coverURL, self.rating = 'N/A', 'N/A', 'http://img407.imageshack.us/img407/6493/titleaddposterw.jpg', 'N/A'
         self.ratingInt = 0
         self.creators, self.directors, self.actors = [], [], []
+        self.creatorsLabel, self.directorsLabel, self.actorsLabel = 'Creator(s)', 'Director(s)', 'Actors'
         
         self.parseData()
 
@@ -43,8 +45,12 @@ class IMDbParser:
         
         # try to download the page several times
         while not found and nbAttempts < nbAttemptsMax:
-            html = urllib.urlopen(self.url).read()
-            found = (self.titlePattern.search(html) is not None)
+            # sometimes urlopen raises an exception, so retry instead of fail
+            try:
+                html = urllib.urlopen(self.url).read()
+                found = (self.titlePattern.search(html) is not None)
+            except:
+                pass
             nbAttempts = nbAttempts + 1
         
         if not found:
@@ -78,6 +84,7 @@ class IMDbParser:
             if creators is None:
                 self.creators.append(IMDbPerson('N/A', ''))
             else:
+                self.creatorsLabel = creators.group('label')
                 creators = creators.group('creators')
                 for c in self.creatorsSubpattern.finditer(creators):
                     self.creators.append(IMDbPerson(c.group('name'), c.group('url')))
@@ -88,11 +95,13 @@ class IMDbParser:
             if directors is None:
                 self.directors.append(IMDbPerson('N/A', ''))
             else:
+                self.directorsLabel = directors.group('label')
                 directors = directors.group('directors')
                 for d in self.directorsSubpattern.finditer(directors):
                     self.directors.append(IMDbPerson(d.group('name'), d.group('url')))
 
         # parse actors
+        self.actorsLabel = self.actorsLabelPattern.search(html).group('label') + ':'
         nbActorsMax = 6
         i = 1
         for a in self.actorPattern.finditer(html):
@@ -109,14 +118,14 @@ class IMDbParser:
         print 'Cover URL:', self.coverURL
         print 'Rating:', self.rating
         if self.isTvSerie:
-            print 'Creator(s):'
+            print self.creatorsLabel
             for c in self.creators:
-                print '', c['name'], c['url']
+                print '', c
         else:
-            print 'Director(s):'
+            print self.directorsLabel
             for d in self.directors:
-                print '', d['name'], d['url']
-        print 'Actors:'
+                print '', d
+        print self.actorsLabel
         for a in self.actors:
-            print '', a['name'], a['url']
-        
+            print '', a
+        return ''
