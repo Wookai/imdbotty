@@ -1,5 +1,6 @@
+from google.appengine.api import urlfetch
+
 import re
-import urllib
 import logging
 
 class IMDbPerson:
@@ -14,7 +15,7 @@ class IMDbParser:
     tvSeriesPattern = re.compile('<span class="tv-extra">[^<]*TV[^<]*</span>')
     titlePattern = re.compile('<div id="tn15title">\s+<h1>(?P<title>[^<]+)\s+<span>\((<a[^>]+>)?(?P<year>\d+)(</a>)?[^)]*\)')
     coverPattern = re.compile('<div class="photo">\s+<a[^>]+><img[^>]+src="(?P<coverURL>http://[^"]+)"[^>]+></a>')
-    ratingPattern = re.compile('<div class="meta">\s+<b>(?P<rating>[\d\.,]+/10)</b>')
+    ratingPattern = re.compile('<div class="starbar-meta">\s+<b>(?P<rating>[\d\.,]+/10)</b>')
     directorsPattern = re.compile('<div[^>]*id="director-info"[^>]*>\s+<h5>(?P<label>[^<]*)</h5>\s+<div class="info-content">\s+(?P<directors>(<a[^>]+>([^<]+)</a>[^<]*<br/>\s+)+)</div>\s+</div>')
     directorsSubpattern = re.compile('<a[^>]+href="(?P<url>[^"]+)"[^>]*>(?P<name>[^<]+)</a>')
     creatorsPattern = re.compile('<div class="info">\s+<h5>(?P<label>[^<]*)</h5>\s+<div class="info-content">\s+(?P<creators>(<a[^>]+>([^<]+)</a>[^<]*<br/>\s+)+)')
@@ -47,7 +48,10 @@ class IMDbParser:
         while not found and nbAttempts < nbAttemptsMax:
             # sometimes urlopen raises an exception, so retry instead of fail
             try:
-                html = urllib.urlopen(self.url).read()
+                headers = {'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.1) Gecko/20100122 firefox/3.6.1'}
+                response =  urlfetch.fetch(url=self.url,
+                                       headers=headers)
+                html = response.content
                 found = (self.titlePattern.search(html) is not None)
             except:
                 pass
